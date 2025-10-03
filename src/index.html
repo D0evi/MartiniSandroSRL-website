@@ -344,5 +344,41 @@
 </footer>
 
 <script type="module" src="./main.js"></script>
+<script>
+    // Fallback: se il modulo non parte (es. apertura file senza server), abilita comunque l'hamburger
+    (function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                if (window.__hamburgerWired) return;
+                var hamburger = document.querySelector('.hamburger');
+                var navMenu = document.querySelector('.nav-menu');
+                var header = document.querySelector('.header');
+                if (!hamburger || !navMenu) return;
+
+                hamburger.addEventListener('click', function() {
+                    hamburger.classList.toggle('active');
+                    navMenu.classList.toggle('active');
+                    document.body.classList.toggle('menu-open');
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (!navMenu.classList.contains('active')) return;
+                    if (header && header.contains(e.target)) return;
+                    hamburger.classList.remove('active');
+                    navMenu.classList.remove('active');
+                    document.body.classList.remove('menu-open');
+                });
+
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth > 768) {
+                        hamburger.classList.remove('active');
+                        navMenu.classList.remove('active');
+                        document.body.classList.remove('menu-open');
+                    }
+                });
+            }, 50);
+        });
+    })();
+    </script>
 </body>
 </html>

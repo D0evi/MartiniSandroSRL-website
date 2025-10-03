@@ -175,6 +175,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         });
+
+        // Segnale globale: wiring hamburger completato
+        try {
+            window.__hamburgerWired = true;
+        } catch (_) { /* no-op */ }
     }
 
     const anchorLinks = document.querySelectorAll('a[href^="#"]');
