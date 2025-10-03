@@ -241,7 +241,7 @@
                                 <i class="fas fa-phone"></i>
                                 <span>Chiama Ora</span>
                             </a>
-                            <a href="https://wa.me/390123456789" class="quick-contact-item whatsapp">
+                            <a href="https://wa.me/393382443944" class="quick-contact-item whatsapp">
                                 <i class="fab fa-whatsapp"></i>
                                 <span>WhatsApp</span>
                             </a>
@@ -360,6 +360,16 @@
                     navMenu.classList.toggle('active');
                     document.body.classList.toggle('menu-open');
                 });
+
+                    // Chiudi menu quando clicchi su una voce di navigazione
+                    navMenu.addEventListener('click', function(e) {
+                        var link = e.target.closest('a');
+                        if (link) {
+                            hamburger.classList.remove('active');
+                            navMenu.classList.remove('active');
+                            document.body.classList.remove('menu-open');
+                        }
+                    });
 
                 document.addEventListener('click', function(e) {
                     if (!navMenu.classList.contains('active')) return;
