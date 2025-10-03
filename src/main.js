@@ -1,4 +1,4 @@
-import DRIVE_CONFIG from './config.js';
+import DRIVE_CONFIG, { FORM_WEBAPP_URL } from './config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const contactForm = document.getElementById('contactForm');
@@ -27,9 +27,23 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                // Qui potrai integrare il servizio di invio (EmailJS, Google Apps Script, ecc.)
-                // Esempio: await inviaRichiesta(data);
-                console.debug('Dati form contatto pronti per l\'invio:', data);
+                // honeypot: se valorizzato, è un bot => esci silenziosamente
+                if (formData.get('company')) {
+                    return;
+                }
+
+                if (!FORM_WEBAPP_URL || FORM_WEBAPP_URL === 'INSERISCI_QUI_URL_WEBAPP') {
+                    throw new Error('Endpoint non configurato');
+                }
+
+                const res = await fetch(FORM_WEBAPP_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                    mode: 'no-cors'
+                });
+
+                // Con no-cors non possiamo leggere la risposta; assumiamo successo
                 showNotification('Richiesta inviata con successo! Ti contatteremo presto.', 'success');
                 contactForm.reset();
             } catch (error) {
