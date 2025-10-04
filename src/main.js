@@ -8,15 +8,11 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault();
 
             const formData = new FormData(contactForm);
-            const data = {
-                name: formData.get('name'),
-                email: formData.get('email'),
-                phone: formData.get('phone'),
-                interesse: formData.get('interesse'),
-                message: formData.get('message'),
-                date: new Date().toISOString(),
-                status: 'nuovo'
-            };
+            // campi aggiuntivi utili lato Apps Script
+            formData.append('date', new Date().toISOString());
+            formData.append('status', 'nuovo');
+            formData.append('origin', window.location.href);
+            formData.append('ua', navigator.userAgent);
 
             const submitBtn = contactForm.querySelector('.submit-btn');
             const originalText = submitBtn ? submitBtn.innerHTML : '';
@@ -36,10 +32,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error('Endpoint non configurato');
                 }
 
-                const res = await fetch(FORM_WEBAPP_URL, {
+                // Invia come FormData per effettuare una "simple request" (no preflight)
+                await fetch(FORM_WEBAPP_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data),
+                    body: formData,
                     mode: 'no-cors'
                 });
 
