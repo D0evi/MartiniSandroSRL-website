@@ -1,4 +1,4 @@
-import DRIVE_CONFIG, { FORM_WEBAPP_URL } from './config.js';
+import { FORM_WEBAPP_URL } from './config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const contactForm = document.getElementById('contactForm');
@@ -100,12 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        if (isDriveConfigured(DRIVE_CONFIG)) {
-            loadProjectsFromDrive(portfolioGrid).catch((error) => {
-                console.error('Errore nel caricamento dei progetti:', error);
-                showNotification('Errore nel caricamento dei progetti. Riprova più tardi.', 'error');
-            });
-        }
+        // Caricamento dinamico da Google Drive disabilitato fino a configurazione completa
     }
 
     const hamburger = document.querySelector('.hamburger');
@@ -228,69 +223,4 @@ function showNotification(message, type = 'success') {
     }, 5000);
 }
 
-function isDriveConfigured(config) {
-    if (!config) {
-        return false;
-    }
-
-    const { folderId, apiKey } = config;
-    const placeholders = ['INSERISCI_QUI_ID_CARTELLA_DRIVE', 'INSERISCI_QUI_API_KEY_GOOGLE'];
-
-    if (!folderId || !apiKey) {
-        return false;
-    }
-
-    return !placeholders.includes(folderId) && !placeholders.includes(apiKey);
-}
-
-async function loadProjectsFromDrive(portfolioGrid) {
-    const { folderId, apiKey } = DRIVE_CONFIG;
-
-    const foldersResponse = await fetch(`https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+mimeType='application/vnd.google-apps.folder'&key=${apiKey}&fields=files(id,name)`);
-    const foldersData = await foldersResponse.json();
-
-    if (!foldersData.files || foldersData.files.length === 0) {
-        return;
-    }
-
-    portfolioGrid.innerHTML = '';
-
-    for (const folder of foldersData.files) {
-        const imagesResponse = await fetch(`https://www.googleapis.com/drive/v3/files?q='${folder.id}'+in+parents&key=${apiKey}&fields=files(id,name,webContentLink,thumbnailLink)`);
-        const imagesData = await imagesResponse.json();
-
-        if (!imagesData.files || imagesData.files.length === 0) {
-            continue;
-        }
-
-        const portfolioItem = document.createElement('div');
-        portfolioItem.className = 'portfolio-item';
-
-        const imageGallery = imagesData.files
-            .filter((file) => Boolean(file.thumbnailLink))
-            .map((file) => `
-                <div class="gallery-item">
-                    <img src="${file.thumbnailLink.replace('=s220', '=s1000')}" 
-                         alt="${file.name.replace(/\.[^/.]+$/, '')}" 
-                         loading="lazy">
-                </div>
-            `)
-            .join('');
-
-        portfolioItem.innerHTML = `
-            <div class="portfolio-header">
-                <h3>${folder.name}</h3>
-                <button class="expand-btn" aria-label="Espandi progetto" aria-expanded="false">
-                    <i class="fas fa-chevron-down"></i>
-                </button>
-            </div>
-            <div class="portfolio-content">
-                <div class="project-gallery">
-                    ${imageGallery}
-                </div>
-            </div>
-        `;
-
-        portfolioGrid.appendChild(portfolioItem);
-    }
-}
+// Funzioni Drive rimosse per evitare errori di build finché non vengono configurate
