@@ -38,9 +38,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: formData,
                     mode: 'no-cors'
                 });
-
+                
                 // Con no-cors non possiamo leggere la risposta; assumiamo successo
                 showNotification('Richiesta inviata con successo! Ti contatteremo presto.', 'success');
+                openSuccessModal();
                 contactForm.reset();
             } catch (error) {
                 console.error('Errore durante l\'invio del form di contatto:', error);
@@ -217,6 +218,27 @@ function showNotification(message, type = 'success') {
         notification.classList.remove('show');
         setTimeout(() => notification.remove(), 300);
     }, 5000);
+}
+
+function openSuccessModal() {
+    const modal = document.getElementById('successModal');
+    const btnClose = document.getElementById('closeSuccessModal');
+    if (!modal || !btnClose) return;
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden', 'false');
+
+    const close = () => {
+        modal.classList.remove('show');
+        modal.setAttribute('aria-hidden', 'true');
+        document.removeEventListener('keydown', onEsc);
+    };
+    const onEsc = (e) => { if (e.key === 'Escape') close(); };
+
+    btnClose.onclick = close;
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) close();
+    });
+    document.addEventListener('keydown', onEsc);
 }
 
 // Funzioni Drive rimosse per evitare errori di build finché non vengono configurate
