@@ -61,6 +61,12 @@ document.addEventListener('DOMContentLoaded', () => {
         portfolioGrid.addEventListener('click', (event) => {
             const header = event.target.closest('.portfolio-header');
             if (!header) {
+                // Check if clicked on an image
+                const img = event.target.closest('.project-gallery img');
+                if (img) {
+                    openLightbox(img.src, img.alt);
+                    return;
+                }
                 return;
             }
 
@@ -95,6 +101,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isExpanded) {
                 content.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
+        });
+
+        // Make images visually indicate they're clickable
+        const portfolioImages = portfolioGrid.querySelectorAll('.project-gallery img');
+        portfolioImages.forEach(img => {
+            img.style.cursor = 'pointer';
+            img.title = 'Clicca per ingrandire';
         });
 
         // Caricamento dinamico da Google Drive disabilitato fino a configurazione completa
@@ -242,3 +255,33 @@ function openSuccessModal() {
 }
 
 // Funzioni Drive rimosse per evitare errori di build finché non vengono configurate
+
+function openLightbox(imageSrc, imageAlt) {
+    const lightbox = document.getElementById('imageLightbox');
+    const lightboxImage = document.getElementById('lightboxImage');
+    const closeBtn = document.getElementById('closeLightbox');
+    
+    if (!lightbox || !lightboxImage || !closeBtn) return;
+    
+    lightboxImage.src = imageSrc;
+    lightboxImage.alt = imageAlt || 'Immagine ingrandita';
+    
+    lightbox.classList.add('show');
+    lightbox.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    
+    const close = () => {
+        lightbox.classList.remove('show');
+        lightbox.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        document.removeEventListener('keydown', onEsc);
+    };
+    
+    const onEsc = (e) => { if (e.key === 'Escape') close(); };
+    
+    closeBtn.onclick = close;
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox || e.target === closeBtn) close();
+    });
+    document.addEventListener('keydown', onEsc);
+}
